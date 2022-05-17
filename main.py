@@ -5,22 +5,22 @@ import numpy as np
 
 
 def read_problem_input(file_name: str) -> List[Tuple[float, float]]:
-    # TODO: Check if correct.
-
     cities = []
     with open(file_name, "r") as f:
         for line in f:
-            x, y = line.split()
-            cities.append((float(x), float(y)))
+            if line[0].isdigit():
+                t, x, y = line.split(" ")[0:3]
+                cities.append((float(x.strip()), float(y.strip())))
     return cities
 
 
 def read_solution_input(file_name: str) -> List[int]:
-    # TODO: Check if correct.
-
+    solution_path = []
     with open(file_name, "r") as f:
         for line in f:
-            return [int(x) for x in line.split()]
+            if line[0].isdigit():
+                solution_path.append(int(line.strip()))
+    return solution_path
 
 
 def fill_distances(cities: List[Tuple[float, float]]):
@@ -69,16 +69,16 @@ def main():
 
     cities: List[Tuple[float, float]]
     proposed_path: List[int]
-    cities_file = "cities.txt"
-    proposed_path_file = "proposed_path.txt"
+    cities_file = "tsp_problems/berlin52.tsp"
+    proposed_path_file = "tsp_problems/berlin52.opt.tour"
     cities = read_problem_input(cities_file)
     proposed_path = read_solution_input(proposed_path_file)
 
-    max_iterations = 100
-    shortest_path: List[int] = find_shortest_path(cities, max_iterations, n_ants)
+    #max_iterations = 100
+    #shortest_path: List[int] = find_shortest_path(cities, max_iterations, n_ants)
 
     fig, (ax1, ax2) = plt.subplots(1, 2)
-    plot_path(cities, shortest_path, ax=ax1)
+    #plot_path(cities, shortest_path, ax=ax1)
     plot_path(cities, proposed_path, ax=ax2)
     plt.show()
 
