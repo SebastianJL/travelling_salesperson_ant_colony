@@ -47,7 +47,7 @@ def select_next_city(tabu_list: List[int], cities: List[Tuple[float, float]], tr
 
     # TODO: Maybe convert to function parameters.
     alpha = 1
-    beta = 1
+    beta = 5
     for city_i in range(n_cities):
         if city_i in tabu_list:
             continue
@@ -96,6 +96,9 @@ def find_shortest_path(cities: List[Tuple[float, float]], max_iterations: int, n
         for ant_i in range(n_ants):
             tabu_list = tabu_lists[ant_i]
             d_trails[tabu_list[:-1], tabu_list[1:]] += Q / tour_lengths[ant_i]
+            d_trails[tabu_list[-1], tabu_list[0]] += Q / tour_lengths[ant_i]
+            d_trails[tabu_list[1:], tabu_list[:-1]] += Q / tour_lengths[ant_i]
+            d_trails[tabu_list[0], tabu_list[-1]] += Q / tour_lengths[ant_i]
 
         print(f'{np.min(tour_lengths) = }')
         rho = 0.5
@@ -126,7 +129,7 @@ def main():
     proposed_path = read_solution_input(proposed_path_file)
 
     max_iterations = 100
-    n_ants = 10
+    n_ants = len(cities)
     shortest_path: List[int] = find_shortest_path(cities, max_iterations, n_ants)
 
     fig, (ax1, ax2) = plt.subplots(1, 2)
