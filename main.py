@@ -1,4 +1,5 @@
-from random import random
+import random
+from copy import deepcopy
 from typing import List, Tuple
 import matplotlib.pyplot as plt
 import numpy as np
@@ -23,7 +24,7 @@ def read_solution_input(file_name: str) -> List[int]:
     return solution_path
 
 
-def fill_distances(cities: List[Tuple[float, float]]):
+def calculate_distances(cities: List[Tuple[float, float]]):
     n_cities = len(cities)
     distances = np.zeros((n_cities, n_cities))
     cities = np.array(cities)
@@ -37,6 +38,26 @@ def fill_distances(cities: List[Tuple[float, float]]):
     return distances
 
 
+def select_next_city(tabu_list: List[int], cities: List[Tuple[float, float]], trails: np.ndarray, distances: np.ndarray):
+    """
+    Selects the next city to visit.
+    """
+    n_cities = len(cities)
+    p = np.zeros(n_cities)
+
+    # TODO: Maybe convert to function parameters.
+    alpha = 1
+    beta = 1
+    for city_i in range(n_cities):
+        if city_i in tabu_list:
+            continue
+        ant_position = tabu_list[-1]
+        p[city_i] = trails[ant_position, city_i]**alpha*distances[ant_position, city_i]**beta
+    p /= np.sum(p)
+    assert(np.all(p >= 0))  # Probabilities should be non-negative and not nan.
+    return random.choices(list(range(n_cities)), weights=list(p))[0]
+
+
 def find_shortest_path(cities: List[Tuple[float, float]], max_iterations: int, n_ants: int) -> List[int]:
     """
     Finds the shortest path between cities using the Ant colony optimization algorithm.
@@ -44,11 +65,28 @@ def find_shortest_path(cities: List[Tuple[float, float]], max_iterations: int, n
     n_cities = len(cities)
     trails = np.full((n_cities, n_cities), 1 / n_cities)
     d_trails = np.zeros((n_cities, n_cities))
-    distances = fill_distances(cities)
-    tabu_list = [[random.choice(range(n_cities))] for _ in range(n_ants)]
-    for t in range(max_iterations):
-        pass
+    distances = calculate_distances(cities)
 
+    # TODO: Check out diffrent initializations of starting positions.
+    tabu_lists_original = [[random.choice(range(n_cities))] for _ in range(n_ants)]
+
+    for t in range(max_iterations):
+
+        # TODO: Test if random choice of starting positionts in each iteration makes a difference.
+        tabu_lists = deepcopy(tabu_lists_original)
+
+        # Construct one path for each ant.
+        for ant_i in range(n_ants):
+            tabu_list = tabu_lists[ant_i]
+            while len(tabu_list) < n_cities:
+                next_city = select_next_city(tabu_list, cities, trails, distances)
+                tabu_list.append(next_city)
+
+        for ant_i in range(n_ants):
+            # Compute path length of ant i.
+
+            # Update shortest path.
+            pass
 
 def plot_path(cities: List[Tuple[float, float]], path: List[int], ax=None):
     # TODO: Check if correct.
@@ -72,13 +110,14 @@ def main():
     cities = read_problem_input(cities_file)
     proposed_path = read_solution_input(proposed_path_file)
 
-    #max_iterations = 100
-    #shortest_path: List[int] = find_shortest_path(cities, max_iterations, n_ants)
+    max_iterations = 100
+    n_ants = 10
+    shortest_path: List[int] = find_shortest_path(cities, max_iterations, n_ants)
 
-    fig, (ax1, ax2) = plt.subplots(1, 2)
-    #plot_path(cities, shortest_path, ax=ax1)
-    plot_path(cities, proposed_path, ax=ax2)
-    plt.show()
+    # fig, (ax1, ax2) = plt.subplots(1, 2)
+    # #plot_path(cities, shortest_path, ax=ax1)
+    # plot_path(cities, proposed_path, ax=ax2)
+    # plt.show()
 
 
 if __name__ == '__main__':
