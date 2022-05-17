@@ -30,15 +30,14 @@ def find_shortest_path(cities: List[Tuple[float, float]], max_iterations: int, n
 
 
 def plot_path(cities: List[Tuple[float, float]], path: List[int], ax=None):
-    # TODO: Check if correct.
     if ax is None:
         ax = plt.gca()
     xs = [c[0] for c in cities]
     ys = [c[1] for c in cities]
     ax.scatter(xs, ys, c="k")
-    for i in range(len(path) - 1):
-        x1, y1 = cities[path[i]]
-        x2, y2 = cities[path[i + 1]]
+    for i in range(len(path)):
+        x1, y1 = cities[path[i] - 1]
+        x2, y2 = cities[path[(i + 1)%len(path)] - 1]
         ax.plot([x1, x2], [y1, y2], c="r")
     plt.show()
 
@@ -51,6 +50,7 @@ def main():
     cities_file = "tsp_problems/berlin52.tsp"
     proposed_path_file = "tsp_problems/berlin52.opt.tour"
     cities = read_problem_input(cities_file)
+    print(cities)
     proposed_path = read_solution_input(proposed_path_file)
 
     #max_iterations = 100
