@@ -101,6 +101,7 @@ def find_shortest_path(cities: List[Tuple[float, float]], max_iterations: int, n
         rho = 0.5
         trails = rho*trails + d_trails
 
+    return tabu_lists[np.argmin(tour_lengths)]
 
 
 def plot_path(cities: List[Tuple[float, float]], path: List[int], ax=None):
@@ -113,7 +114,6 @@ def plot_path(cities: List[Tuple[float, float]], path: List[int], ax=None):
         x1, y1 = cities[path[i] - 1]
         x2, y2 = cities[path[(i + 1)%len(path)] - 1]
         ax.plot([x1, x2], [y1, y2], c="r")
-    plt.show()
 
 
 def main():
@@ -129,10 +129,10 @@ def main():
     n_ants = 10
     shortest_path: List[int] = find_shortest_path(cities, max_iterations, n_ants)
 
-    # fig, (ax1, ax2) = plt.subplots(1, 2)
-    # #plot_path(cities, shortest_path, ax=ax1)
-    # plot_path(cities, proposed_path, ax=ax2)
-    # plt.show()
+    fig, (ax1, ax2) = plt.subplots(1, 2)
+    plot_path(cities, shortest_path, ax=ax1)
+    plot_path(cities, proposed_path, ax=ax2)
+    plt.show()
 
 
 if __name__ == '__main__':
