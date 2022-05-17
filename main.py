@@ -9,8 +9,9 @@ def read_problem_input(file_name: str) -> List[Tuple[float, float]]:
     cities = []
     with open(file_name, "r") as f:
         for line in f:
+            line = line.strip()
             if line[0].isdigit():
-                t, x, y = line.split(" ")[0:3]
+                t, x, y = line.split()[0:3]
                 cities.append((float(x.strip()), float(y.strip())))
     return cities
 
@@ -122,11 +123,11 @@ def plot_path(cities: List[Tuple[float, float]], path: List[int], ax=None):
 def main():
     cities: List[Tuple[float, float]]
     proposed_path: List[int]
-    cities_file = "tsp_problems/berlin52.tsp"
-    proposed_path_file = "tsp_problems/berlin52.opt.tour"
+    cities_file = "tsp_problems/burma14.tsp"
+    #proposed_path_file = "tsp_problems/berlin52.opt.tour"
     cities = read_problem_input(cities_file)
     print(cities)
-    proposed_path = read_solution_input(proposed_path_file)
+    #proposed_path = read_solution_input(proposed_path_file)
 
     max_iterations = 100
     n_ants = len(cities)
@@ -134,7 +135,7 @@ def main():
 
     fig, (ax1, ax2) = plt.subplots(1, 2)
     plot_path(cities, shortest_path, ax=ax1)
-    plot_path(cities, proposed_path, ax=ax2)
+    #plot_path(cities, proposed_path, ax=ax2)
     plt.show()
 
 
