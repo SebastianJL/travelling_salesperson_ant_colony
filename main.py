@@ -65,8 +65,6 @@ def plot_path(cities: List[Tuple[float, float]], path: List[int], ax=None):
 
 
 def main():
-    print("Hello World!")
-
     cities: List[Tuple[float, float]]
     proposed_path: List[int]
     cities_file = "tsp_problems/berlin52.tsp"
