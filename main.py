@@ -52,7 +52,7 @@ def select_next_city(tabu_list: List[int], cities: List[Tuple[float, float]], tr
         if city_i in tabu_list:
             continue
         ant_position = tabu_list[-1]
-        p[city_i] = trails[ant_position, city_i]**alpha*distances[ant_position, city_i]**beta
+        p[city_i] = trails[ant_position, city_i]**alpha * 1/distances[ant_position, city_i]**beta
     p /= np.sum(p)
     assert(np.all(p >= 0))  # Probabilities should be non-negative and not nan.
     return random.choices(list(range(n_cities)), weights=list(p))[0]
