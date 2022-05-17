@@ -70,10 +70,11 @@ def find_shortest_path(cities: List[Tuple[float, float]], max_iterations: int, n
     # TODO: Check out diffrent initializations of starting positions.
     tabu_lists_original = [[random.choice(range(n_cities))] for _ in range(n_ants)]
 
-    for t in range(max_iterations):
+    for cycle_number in range(max_iterations):
 
         # TODO: Test if random choice of starting positionts in each iteration makes a difference.
         tabu_lists = deepcopy(tabu_lists_original)
+        d_trails[:] = 0
 
         # Construct one path for each ant.
         for ant_i in range(n_ants):
@@ -82,11 +83,25 @@ def find_shortest_path(cities: List[Tuple[float, float]], max_iterations: int, n
                 next_city = select_next_city(tabu_list, cities, trails, distances)
                 tabu_list.append(next_city)
 
+        # Calculate tour length for each ant.
+        tour_lengths = []
         for ant_i in range(n_ants):
-            # Compute path length of ant i.
+            tabu_list = tabu_lists[ant_i]
+            segment_lengths = [distances[tabu_list[i], tabu_list[i + 1]] for i in range(len(tabu_list) - 1)]
+            tour_lengths.append(np.sum(segment_lengths))
 
-            # Update shortest path.
-            pass
+        # Update trails.
+        # TODO: Maybe make Q a function parameter.
+        Q = 100
+        for ant_i in range(n_ants):
+            tabu_list = tabu_lists[ant_i]
+            d_trails[tabu_list[:-1], tabu_list[1:]] += Q / tour_lengths[ant_i]
+
+        print(f'{np.min(tour_lengths) = }')
+        rho = 0.5
+        trails = rho*trails + d_trails
+
+
 
 def plot_path(cities: List[Tuple[float, float]], path: List[int], ax=None):
     # TODO: Check if correct.
