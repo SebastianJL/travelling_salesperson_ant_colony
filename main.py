@@ -1,5 +1,6 @@
 import random
 from copy import deepcopy
+from pathlib import Path
 from typing import List, Tuple
 import matplotlib.pyplot as plt
 import numpy as np
@@ -159,7 +160,7 @@ def plot_path(cities: List[Tuple[float, float]], path: List[int], ax=None):
 def main():
     cities: List[Tuple[float, float]]
     proposed_path: List[int]
-    cities_file = "tsp_problems/berlin52.tsp"
+    cities_file = Path("tsp_problems/berlin52.tsp")
     proposed_path_file = "tsp_problems/berlin52.opt.tour"
     cities = read_problem_input(cities_file)
     proposed_path = read_solution_input(proposed_path_file)
@@ -176,7 +177,7 @@ def main():
     fig, (ax1, ax2) = plt.subplots(1, 2)
     plot_path(cities, shortest_path, ax=ax1)
     plot_path(cities, proposed_path, ax=ax2)
-    fig.suptitle(f'# cities{len(cities)}, # cycles: {max_iterations}')
+    fig.suptitle(f'{cities_file.stem}, #cycles: {max_iterations}')
     ax1.set_title(f"Path found: {shortest_path_length:.2f}.")
     ax2.set_title(f"Optimal path: {proposed_path_length:.2f}.")
     plt.show()
