@@ -43,20 +43,22 @@ def select_next_city(tabu_list: List[int], cities: List[Tuple[float, float]], tr
     """
     Selects the next city to visit.
     """
+    assert(len(tabu_list) != 0)
     n_cities = len(cities)
     p = np.zeros(n_cities)
 
     # TODO: Maybe convert to function parameters.
     alpha = 1
     beta = 5
+    ant_position = tabu_list[-1]
     for city_i in range(n_cities):
         if city_i in tabu_list:
             continue
-        ant_position = tabu_list[-1]
         p[city_i] = trails[ant_position, city_i]**alpha * 1/distances[ant_position, city_i]**beta
-    p /= np.sum(p)
     assert(np.all(p >= 0))  # Probabilities should be non-negative and not nan.
-    return random.choices(list(range(n_cities)), weights=list(p))[0]
+    assert(np.any(p > 0))
+    p /= np.sum(p)
+    return random.choices(list(range(n_cities)), weights=p)[0]
 
 
 def find_shortest_path(cities: List[Tuple[float, float]], max_iterations: int, n_ants: int) -> List[int]:
