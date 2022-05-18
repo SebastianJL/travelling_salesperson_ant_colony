@@ -13,7 +13,10 @@ def read_problem_input(file_name: str) -> List[Tuple[float, float]]:
             if line == "":
                 continue
             if line[0].isdigit():
-                t, x, y = line.split()[0:3]
+                try:
+                    t, x, y, *_ = line.split()
+                except ValueError:
+                    x, y, *_ = line.split()
                 cities.append((float(x.strip()), float(y.strip())))
     return cities
 
@@ -22,8 +25,13 @@ def read_solution_input(file_name: str) -> List[int]:
     solution_path = []
     with open(file_name, "r") as f:
         for line in f:
+            line = line.strip()
+            if line == "":
+                continue
             if line[0].isdigit():
-                solution_path.append(int(line.strip())-1)
+                # Subtract 1 to get from 1-indexed to 0-indexed cities.
+                city_index = int(line.strip()) - 1
+                solution_path.append(city_index)
     return solution_path
 
 
@@ -149,11 +157,10 @@ def plot_path(cities: List[Tuple[float, float]], path: List[int], ax=None):
 def main():
     cities: List[Tuple[float, float]]
     proposed_path: List[int]
-    cities_file = "tsp_problems/berlin52.tsp"
-    proposed_path_file = "tsp_problems/berlin52.opt.tour"
+    cities_file = "tsp_problems/oliver30.tsp"
+    proposed_path_file = "tsp_problems/oliver30.opt.tour"
     cities = read_problem_input(cities_file)
     proposed_path = read_solution_input(proposed_path_file)
-    #proposed_path = list(range(14))
 
     max_iterations = 100
     n_ants = len(cities)
