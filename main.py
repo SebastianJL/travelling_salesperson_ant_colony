@@ -71,7 +71,7 @@ def find_shortest_path(cities: List[Tuple[float, float]], max_iterations: int, n
     d_trails = np.zeros((n_cities, n_cities))
     distances = calculate_distances(cities)
 
-    # TODO: Check out diffrent initializations of starting positions.
+    # TODO: Check out different initializations of starting positions.
     tabu_lists_original = [[random.choice(range(n_cities))] for _ in range(n_ants)]
 
     for cycle_number in range(max_iterations):
@@ -110,6 +110,7 @@ def find_shortest_path(cities: List[Tuple[float, float]], max_iterations: int, n
         # Limit minimum value of trails to avoid probabilities of zero.
         trails[trails < trails_min] = trails_min
 
+    # TODO: Maybe return the best path instead of the last one.
     return tabu_lists[np.argmin(tour_lengths)]
 
 
