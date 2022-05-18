@@ -159,21 +159,26 @@ def plot_path(cities: List[Tuple[float, float]], path: List[int], ax=None):
 def main():
     cities: List[Tuple[float, float]]
     proposed_path: List[int]
-    cities_file = "tsp_problems/oliver30.tsp"
-    proposed_path_file = "tsp_problems/oliver30.opt.tour"
+    cities_file = "tsp_problems/berlin52.tsp"
+    proposed_path_file = "tsp_problems/berlin52.opt.tour"
     cities = read_problem_input(cities_file)
     proposed_path = read_solution_input(proposed_path_file)
 
-    max_iterations = 100
+    max_iterations = 200
     n_ants = len(cities)
     shortest_path: List[int] = find_shortest_path(cities, max_iterations, n_ants)
 
-    print(f'{calculate_path_length(cities, shortest_path)}')
-    print(f'{calculate_path_length(cities, proposed_path)}')
+    shortest_path_length = calculate_path_length(cities, shortest_path)
+    proposed_path_length = calculate_path_length(cities, proposed_path)
+    print(f'{shortest_path_length = }')
+    print(f'{proposed_path_length = }')
 
     fig, (ax1, ax2) = plt.subplots(1, 2)
     plot_path(cities, shortest_path, ax=ax1)
     plot_path(cities, proposed_path, ax=ax2)
+    fig.suptitle(f'# cities{len(cities)}, # cycles: {max_iterations}')
+    ax1.set_title(f"Path found: {shortest_path_length:.2f}.")
+    ax2.set_title(f"Optimal path: {proposed_path_length:.2f}.")
     plt.show()
 
 
