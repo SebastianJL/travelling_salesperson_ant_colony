@@ -45,20 +45,22 @@ def select_next_city(tabu_list: List[int], cities: List[Tuple[float, float]], tr
     """
     Selects the next city to visit.
     """
+    assert(len(tabu_list) != 0)
     n_cities = len(cities)
     p = np.zeros(n_cities)
 
     # TODO: Maybe convert to function parameters.
     alpha = 1
     beta = 5
+    ant_position = tabu_list[-1]
     for city_i in range(n_cities):
         if city_i in tabu_list:
             continue
-        ant_position = tabu_list[-1]
         p[city_i] = trails[ant_position, city_i]**alpha * 1/distances[ant_position, city_i]**beta
-    p /= np.sum(p)
     assert(np.all(p >= 0))  # Probabilities should be non-negative and not nan.
-    return random.choices(list(range(n_cities)), weights=list(p))[0]
+    assert(np.any(p > 0))
+    p /= np.sum(p)
+    return random.choices(list(range(n_cities)), weights=p)[0]
 
 
 def find_shortest_path(cities: List[Tuple[float, float]], max_iterations: int, n_ants: int) -> List[int]:
@@ -66,11 +68,12 @@ def find_shortest_path(cities: List[Tuple[float, float]], max_iterations: int, n
     Finds the shortest path between cities using the Ant colony optimization algorithm.
     """
     n_cities = len(cities)
-    trails = np.full((n_cities, n_cities), 1 / n_cities)
+    trails_min = 0.01
+    trails = np.full((n_cities, n_cities), trails_min)
     d_trails = np.zeros((n_cities, n_cities))
     distances = calculate_distances(cities)
 
-    # TODO: Check out diffrent initializations of starting positions.
+    # TODO: Check out different initializations of starting positions.
     tabu_lists_original = [[random.choice(range(n_cities))] for _ in range(n_ants)]
 
     for cycle_number in range(max_iterations):
@@ -106,8 +109,21 @@ def find_shortest_path(cities: List[Tuple[float, float]], max_iterations: int, n
         print(f'{np.min(tour_lengths) = }')
         rho = 0.5
         trails = rho*trails + d_trails
+        # Limit minimum value of trails to avoid probabilities of zero.
+        trails[trails < trails_min] = trails_min
 
+    # TODO: Maybe return the best path instead of the last one.
     return tabu_lists[np.argmin(tour_lengths)]
+
+
+def calculate_path_length(cities: List[Tuple[float, float]], path: List[int]) -> float:
+    """
+    Calculates the length of a path.
+    """
+    assert(len(path) > 1)
+    distances = calculate_distances(cities)
+    segment_lengths = [distances[path[i], path[i + 1]] for i in range(len(path) - 1)]
+    return np.sum(segment_lengths)
 
 
 def plot_path(cities: List[Tuple[float, float]], path: List[int], ax=None):
@@ -135,6 +151,9 @@ def main():
     max_iterations = 100
     n_ants = len(cities)
     shortest_path: List[int] = find_shortest_path(cities, max_iterations, n_ants)
+
+    print(f'{calculate_path_length(cities, shortest_path)}')
+    print(f'{calculate_path_length(cities, proposed_path)}')
 
     fig, (ax1, ax2) = plt.subplots(1, 2)
     plot_path(cities, shortest_path, ax=ax1)
