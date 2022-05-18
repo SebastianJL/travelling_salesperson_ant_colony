@@ -105,7 +105,8 @@ def find_shortest_path(cities: List[Tuple[float, float]], max_iterations: int, n
         tour_lengths = []
         for ant_i in range(n_ants):
             tabu_list = tabu_lists[ant_i]
-            segment_lengths = [distances[tabu_list[i], tabu_list[i + 1]] for i in range(len(tabu_list) - 1)]
+            n_segments = len(tabu_list)
+            segment_lengths = [distances[tabu_list[i], tabu_list[(i + 1)%n_segments]] for i in range(n_segments)]
             tour_lengths.append(np.sum(segment_lengths))
 
         # Update trails.
@@ -135,9 +136,10 @@ def calculate_path_length(cities: List[Tuple[float, float]], path: List[int]) ->
     """
     Calculates the length of a path.
     """
-    assert(len(path) > 1)
+    n_segments = len(path)
+    assert(n_segments > 1)
     distances = calculate_distances(cities)
-    segment_lengths = [distances[path[i], path[i + 1]] for i in range(len(path) - 1)]
+    segment_lengths = [distances[path[i], path[(i + 1)%n_segments]] for i in range(n_segments)]
     return np.sum(segment_lengths)
 
 
