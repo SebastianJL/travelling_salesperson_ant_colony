@@ -114,6 +114,16 @@ def find_shortest_path(cities: List[Tuple[float, float]], max_iterations: int, n
     return tabu_lists[np.argmin(tour_lengths)]
 
 
+def calculate_path_length(cities: List[Tuple[float, float]], path: List[int]) -> float:
+    """
+    Calculates the length of a path.
+    """
+    assert(len(path) > 1)
+    distances = calculate_distances(cities)
+    segment_lengths = [distances[path[i], path[i + 1]] for i in range(len(path) - 1)]
+    return np.sum(segment_lengths)
+
+
 def plot_path(cities: List[Tuple[float, float]], path: List[int], ax=None):
     if ax is None:
         ax = plt.gca()
@@ -138,6 +148,9 @@ def main():
     max_iterations = 100
     n_ants = len(cities)
     shortest_path: List[int] = find_shortest_path(cities, max_iterations, n_ants)
+
+    print(f'{calculate_path_length(cities, shortest_path)}')
+    print(f'{calculate_path_length(cities, proposed_path)}')
 
     fig, (ax1, ax2) = plt.subplots(1, 2)
     plot_path(cities, shortest_path, ax=ax1)
