@@ -66,7 +66,8 @@ def find_shortest_path(cities: List[Tuple[float, float]], max_iterations: int, n
     Finds the shortest path between cities using the Ant colony optimization algorithm.
     """
     n_cities = len(cities)
-    trails = np.full((n_cities, n_cities), 1 / n_cities)
+    trails_min = 0.01
+    trails = np.full((n_cities, n_cities), trails_min)
     d_trails = np.zeros((n_cities, n_cities))
     distances = calculate_distances(cities)
 
@@ -106,6 +107,8 @@ def find_shortest_path(cities: List[Tuple[float, float]], max_iterations: int, n
         print(f'{np.min(tour_lengths) = }')
         rho = 0.5
         trails = rho*trails + d_trails
+        # Limit minimum value of trails to avoid probabilities of zero.
+        trails[trails < trails_min] = trails_min
 
     return tabu_lists[np.argmin(tour_lengths)]
 
