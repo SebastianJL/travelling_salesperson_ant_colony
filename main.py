@@ -67,7 +67,6 @@ np.ndarray, alpha: float, beta: float) -> Optional[int]:
     assert (np.all(p >= 0))  # Probabilities should be non-negative and not nan.
     if np.all(p == 0):  # No valid next city found.
         return None
-    p /= np.sum(p)
     return random.choices(range(n_cities), weights=p)[0]
 
 
