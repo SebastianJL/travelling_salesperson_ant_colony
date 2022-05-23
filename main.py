@@ -4,7 +4,6 @@ from pathlib import Path
 from typing import List, Tuple, Optional
 import matplotlib.pyplot as plt
 import numpy as np
-from numba import jit
 
 
 def read_problem_input(file_name: str) -> List[Tuple[float, float]]:
@@ -121,7 +120,9 @@ def find_shortest_path(cities: List[Tuple[float, float]], max_iterations: int, a
             d_trails[tabu_list[1:], tabu_list[:-1]] += Q/tour_length
             d_trails[tabu_list[0], tabu_list[-1]] += Q/tour_length
 
-        print(f'{np.min(tour_lengths) = }')
+        if cycle_number % 10 == 0:
+            print(f'{cycle_number}: {np.min(tour_lengths) = }')
+
         rho = 0.5
         trails = rho*trails + d_trails
 
@@ -162,12 +163,12 @@ def plot_path(cities: List[Tuple[float, float]], path: List[int], ax=None):
 def main():
     cities: List[Tuple[float, float]]
     proposed_path: List[int]
-    cities_file = Path("tsp_problems/berlin52.tsp")
-    proposed_path_file = "tsp_problems/berlin52.opt.tour"
+    cities_file = Path("tsp_problems/oliver30.tsp")
+    proposed_path_file = "tsp_problems/oliver30.opt.tour"
     cities = read_problem_input(cities_file)
     proposed_path = read_solution_input(proposed_path_file)
 
-    params = {'max_iterations': 10,
+    params = {'max_iterations': 2500,
               'alpha': 1,
               'beta': 5}
     t0 = time.perf_counter()
