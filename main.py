@@ -55,7 +55,7 @@ np.ndarray) -> Optional[int]:
     """
     Selects the next city to visit.
     """
-    assert(len(tabu_list) != 0)
+    assert (len(tabu_list) != 0)
     n_cities = len(cities)
     p = np.zeros(n_cities)
 
@@ -66,8 +66,8 @@ np.ndarray) -> Optional[int]:
     for city_i in range(n_cities):
         if city_i in tabu_list:
             continue
-        p[city_i] = trails[ant_position, city_i]**alpha * 1/distances[ant_position, city_i]**beta
-    assert(np.all(p >= 0))  # Probabilities should be non-negative and not nan.
+        p[city_i] = trails[ant_position, city_i]**alpha*1/distances[ant_position, city_i]**beta
+    assert (np.all(p >= 0))  # Probabilities should be non-negative and not nan.
     if np.all(p == 0):  # No valid next city found.
         return None
     p /= np.sum(p)
@@ -118,10 +118,10 @@ def find_shortest_path(cities: List[Tuple[float, float]], max_iterations: int) -
         # TODO: Maybe make Q a function parameter.
         Q = 100
         for tabu_list, tour_length in zip(tabu_lists, tour_lengths):
-            d_trails[tabu_list[:-1], tabu_list[1:]] += Q / tour_length
-            d_trails[tabu_list[-1], tabu_list[0]] += Q / tour_length
-            d_trails[tabu_list[1:], tabu_list[:-1]] += Q / tour_length
-            d_trails[tabu_list[0], tabu_list[-1]] += Q / tour_length
+            d_trails[tabu_list[:-1], tabu_list[1:]] += Q/tour_length
+            d_trails[tabu_list[-1], tabu_list[0]] += Q/tour_length
+            d_trails[tabu_list[1:], tabu_list[:-1]] += Q/tour_length
+            d_trails[tabu_list[0], tabu_list[-1]] += Q/tour_length
 
         print(f'{np.min(tour_lengths) = }')
         rho = 0.5
@@ -142,7 +142,7 @@ def calculate_path_length(cities: List[Tuple[float, float]], path: List[int]) ->
     Calculates the length of a path.
     """
     n_segments = len(path)
-    assert(n_segments > 1)
+    assert (n_segments > 1)
     distances = calculate_distances(cities)
     segment_lengths = [distances[path[i], path[(i + 1)%n_segments]] for i in range(n_segments)]
     return np.sum(segment_lengths)
