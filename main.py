@@ -69,7 +69,7 @@ np.ndarray, alpha: float, beta: float) -> Optional[int]:
     if np.all(p == 0):  # No valid next city found.
         return None
     p /= np.sum(p)
-    return random.choices(list(range(n_cities)), weights=p)[0]
+    return random.choices(range(n_cities), weights=p)[0]
 
 
 def find_shortest_path(cities: List[Tuple[float, float]], max_iterations: int, alpha: float, beta: float) -> List[int]:
