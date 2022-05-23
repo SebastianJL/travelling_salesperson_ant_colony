@@ -1,6 +1,5 @@
 import random
 import time
-from copy import deepcopy
 from pathlib import Path
 from typing import List, Tuple, Optional
 import matplotlib.pyplot as plt
