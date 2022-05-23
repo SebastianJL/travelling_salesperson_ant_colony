@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import List, Tuple, Optional
 import matplotlib.pyplot as plt
 import numpy as np
+from numba import jit
 
 
 def read_problem_input(file_name: str) -> List[Tuple[float, float]]:
@@ -50,8 +51,9 @@ def calculate_distances(cities: List[Tuple[float, float]]):
     return distances
 
 
+# @jit(nopython=True)
 def select_next_city(tabu_list: List[int], cities: List[Tuple[float, float]], trails: np.ndarray, distances:
-np.ndarray) -> Optional[int]:
+np.ndarray, alpha: float, beta: float) -> Optional[int]:
     """
     Selects the next city to visit.
     """
@@ -59,9 +61,6 @@ np.ndarray) -> Optional[int]:
     n_cities = len(cities)
     p = np.zeros(n_cities)
 
-    # TODO: Maybe convert to function parameters.
-    alpha = 1
-    beta = 5
     ant_position = tabu_list[-1]
     for city_i in range(n_cities):
         if city_i in tabu_list:
@@ -74,7 +73,7 @@ np.ndarray) -> Optional[int]:
     return random.choices(list(range(n_cities)), weights=p)[0]
 
 
-def find_shortest_path(cities: List[Tuple[float, float]], max_iterations: int) -> List[int]:
+def find_shortest_path(cities: List[Tuple[float, float]], max_iterations: int, alpha: float, beta: float) -> List[int]:
     """
     Finds the shortest path between cities using the Ant colony optimization algorithm.
     """
@@ -98,7 +97,7 @@ def find_shortest_path(cities: List[Tuple[float, float]], max_iterations: int) -
         for ant_i in range(n_ants):
             tabu_list = [ant_i]
             while len(tabu_list) < n_cities:
-                next_city = select_next_city(tabu_list, cities, trails, distances)
+                next_city = select_next_city(tabu_list, cities, trails, distances, alpha, beta)
 
                 if next_city is None:
                     break
@@ -169,8 +168,10 @@ def main():
     cities = read_problem_input(cities_file)
     proposed_path = read_solution_input(proposed_path_file)
 
-    max_iterations = 200
-    shortest_path: List[int] = find_shortest_path(cities, max_iterations)
+    params = {'max_iterations': 10,
+              'alpha': 1,
+              'beta': 5}
+    shortest_path: List[int] = find_shortest_path(cities, **params)
 
     shortest_path_length = calculate_path_length(cities, shortest_path)
     proposed_path_length = calculate_path_length(cities, proposed_path)
@@ -180,7 +181,7 @@ def main():
     fig, (ax1, ax2) = plt.subplots(1, 2)
     plot_path(cities, shortest_path, ax=ax1)
     plot_path(cities, proposed_path, ax=ax2)
-    fig.suptitle(f'{cities_file.stem}, #cycles: {max_iterations}')
+    fig.suptitle(f'{cities_file.stem}, #cycles: {params["max_iterations"]}')
     ax1.set_title(f"Path found: {shortest_path_length:.2f}.")
     ax2.set_title(f"Optimal path: {proposed_path_length:.2f}.")
     plt.show()
