@@ -174,6 +174,7 @@ def main():
     t0 = time.perf_counter()
     shortest_path: List[int] = find_shortest_path(cities, **params)
     t1 = time.perf_counter()
+    print(params)
     print(f'\nFinding shortest path took: {t1 - t0:.1f}s')
 
     shortest_path_length = calculate_path_length(cities, shortest_path)
