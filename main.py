@@ -1,4 +1,5 @@
 import random
+import time
 from copy import deepcopy
 from pathlib import Path
 from typing import List, Tuple, Optional
@@ -51,7 +52,6 @@ def calculate_distances(cities: List[Tuple[float, float]]):
     return distances
 
 
-# @jit(nopython=True)
 def select_next_city(tabu_list: List[int], cities: List[Tuple[float, float]], trails: np.ndarray, distances:
 np.ndarray, alpha: float, beta: float) -> Optional[int]:
     """
@@ -171,7 +171,10 @@ def main():
     params = {'max_iterations': 10,
               'alpha': 1,
               'beta': 5}
+    t0 = time.perf_counter()
     shortest_path: List[int] = find_shortest_path(cities, **params)
+    t1 = time.perf_counter()
+    print(f'\nFinding shortest path took: {t1 - t0:.1f}s')
 
     shortest_path_length = calculate_path_length(cities, shortest_path)
     proposed_path_length = calculate_path_length(cities, proposed_path)
