@@ -67,8 +67,8 @@ np.ndarray, alpha: float, beta: float) -> Optional[int]:
     assert (np.all(p >= 0))  # Probabilities should be non-negative and not nan.
     if np.all(p == 0):  # No valid next city found.
         return None
-    np.cumsum(p, out=p)
-    return random.choices(range(n_cities), cum_weights=p)[0]
+    p_cum = np.cumsum(p)
+    return random.choices(range(n_cities), cum_weights=p_cum)[0]
 
 
 def find_shortest_path(cities: List[Tuple[float, float]], max_iterations: int, alpha: float, beta: float, gather_stats: bool = False) -> Tuple[List[int], float]:
