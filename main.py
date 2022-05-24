@@ -121,7 +121,7 @@ def find_shortest_path(cities: List[Tuple[float, float]], max_iterations: int, a
             d_trails[tabu_list[0], tabu_list[-1]] += Q/tour_length
 
         if cycle_number % 10 == 0:
-            print(f'{cycle_number}: {np.min(tour_lengths) = }')
+            print(f'{cycle_number}: {np.min(tour_lengths) = :.2f}')
 
         rho = 0.5
         trails = rho*trails + d_trails
@@ -133,7 +133,7 @@ def find_shortest_path(cities: List[Tuple[float, float]], max_iterations: int, a
             shortest_distance = np.min(tour_lengths)
             shortest_path = tabu_lists[np.argmin(tour_lengths)]
 
-    return shortest_path
+    return shortest_path, trails
 
 
 def calculate_path_length(cities: List[Tuple[float, float]], path: List[int]) -> float:
@@ -160,6 +160,23 @@ def plot_path(cities: List[Tuple[float, float]], path: List[int], ax=None):
     ax.axis("equal")
 
 
+def plot_trails(cities: List[Tuple[float, float]], trails: np.ndarray, ax=None):
+    if ax is None:
+        ax = plt.gca()
+    xs = [c[0] for c in cities]
+    ys = [c[1] for c in cities]
+    trails = 2*trails/np.max(trails)
+    ax.scatter(xs, ys, c="k")
+    for i in range(len(trails)):
+        for j in range(len(trails)):
+            trail = trails[i, j]
+            if trail != 0:
+                x1, y1 = cities[i]
+                x2, y2 = cities[j]
+                ax.plot([x1, x2], [y1, y2], c="b", linewidth=trail)
+    ax.axis("equal")
+
+
 def main():
     cities: List[Tuple[float, float]]
     proposed_path: List[int]
@@ -168,26 +185,28 @@ def main():
     cities = read_problem_input(cities_file)
     proposed_path = read_solution_input(proposed_path_file)
 
-    params = {'max_iterations': 200,
+    params = {'max_iterations': 5000,
               'alpha': 1,
               'beta': 5}
     t0 = time.perf_counter()
-    shortest_path: List[int] = find_shortest_path(cities, **params)
+    shortest_path, trails = find_shortest_path(cities, **params)
     t1 = time.perf_counter()
     print(params)
     print(f'\nFinding shortest path took: {t1 - t0:.1f}s')
 
     shortest_path_length = calculate_path_length(cities, shortest_path)
     proposed_path_length = calculate_path_length(cities, proposed_path)
-    print(f'{shortest_path_length = }')
-    print(f'{proposed_path_length = }')
+    print(f'{shortest_path_length = :.2f}')
+    print(f'{proposed_path_length = :.2f}')
 
-    fig, (ax1, ax2) = plt.subplots(1, 2)
+    fig, (ax1, ax2, ax3) = plt.subplots(1, 3)
     plot_path(cities, shortest_path, ax=ax1)
     plot_path(cities, proposed_path, ax=ax2)
+    plot_trails(cities, trails, ax=ax3)
     fig.suptitle(f'{cities_file.stem}, #cycles: {params["max_iterations"]}')
     ax1.set_title(f"Path found: {shortest_path_length:.2f}.")
     ax2.set_title(f"Optimal path: {proposed_path_length:.2f}.")
+    ax3.set_title(f"Trails")
     plt.show()
 
 
