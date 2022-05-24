@@ -63,7 +63,7 @@ np.ndarray, alpha: float, beta: float) -> Optional[int]:
     for city_i in range(n_cities):
         if city_i in tabu_list:
             continue
-        p[city_i] = trails[ant_position, city_i]**alpha*1/distances[ant_position, city_i]**beta
+        p[city_i] = trails[ant_position, city_i]**alpha * 1/distances[ant_position, city_i]**beta
     assert (np.all(p >= 0))  # Probabilities should be non-negative and not nan.
     if np.all(p == 0):  # No valid next city found.
         return None
@@ -71,7 +71,7 @@ np.ndarray, alpha: float, beta: float) -> Optional[int]:
     return random.choices(range(n_cities), cum_weights=p)[0]
 
 
-def find_shortest_path(cities: List[Tuple[float, float]], max_iterations: int, alpha: float, beta: float) -> List[int]:
+def find_shortest_path(cities: List[Tuple[float, float]], max_iterations: int, alpha: float, beta: float, gather_stats: bool = False) -> Tuple[List[int], float]:
     """
     Finds the shortest path between cities using the Ant colony optimization algorithm.
     """
@@ -85,6 +85,12 @@ def find_shortest_path(cities: List[Tuple[float, float]], max_iterations: int, a
     # Init global shortest path
     shortest_distance = np.inf
     shortest_path = None
+
+    if gather_stats:
+        shortest_distance_per_cycle = []
+        distance_std_per_cycle = []
+        avg_node_branchings_per_cycle = []
+
 
     for cycle_number in range(max_iterations):
 
@@ -133,7 +139,17 @@ def find_shortest_path(cities: List[Tuple[float, float]], max_iterations: int, a
             shortest_distance = np.min(tour_lengths)
             shortest_path = tabu_lists[np.argmin(tour_lengths)]
 
-    return shortest_path, trails
+        if gather_stats:
+            shortest_distance_per_cycle.append(np.min(tour_lengths))
+            distance_std_per_cycle.append(np.std(tour_lengths))
+            avg_node_branching = np.count_nonzero(trails) / n_cities
+            avg_node_branchings_per_cycle.append(avg_node_branching)
+
+    if gather_stats:
+        return shortest_path, trails, shortest_distance_per_cycle, distance_std_per_cycle, \
+               avg_node_branchings_per_cycle
+    else:
+        return shortest_path, trails
 
 
 def calculate_path_length(cities: List[Tuple[float, float]], path: List[int]) -> float:
@@ -185,14 +201,15 @@ def main():
     cities = read_problem_input(cities_file)
     proposed_path = read_solution_input(proposed_path_file)
 
-    params = {'max_iterations': 5000,
+    params = {'max_iterations': 300,
               'alpha': 1,
               'beta': 5}
     t0 = time.perf_counter()
     shortest_path, trails = find_shortest_path(cities, **params)
     t1 = time.perf_counter()
+    print()
     print(params)
-    print(f'\nFinding shortest path took: {t1 - t0:.1f}s')
+    print(f'Finding shortest path took: {t1 - t0:.1f}s')
 
     shortest_path_length = calculate_path_length(cities, shortest_path)
     proposed_path_length = calculate_path_length(cities, proposed_path)
@@ -206,7 +223,9 @@ def main():
     fig.suptitle(f'{cities_file.stem}, #cycles: {params["max_iterations"]}')
     ax1.set_title(f"Path found: {shortest_path_length:.2f}.")
     ax2.set_title(f"Optimal path: {proposed_path_length:.2f}.")
-    ax3.set_title(f"Trails")
+    nonzero_trails = np.count_nonzero(trails)//2
+    all_trails = trails.size//2 - len(cities)
+    ax3.set_title(f"Trails: {nonzero_trails}/{all_trails}.")
     plt.show()
 
 
