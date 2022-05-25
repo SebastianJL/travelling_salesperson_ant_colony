@@ -3,6 +3,6 @@ title: Travelling Salesperson Problem - Ant Colony Algorithm
 message: Please cite as below
 type: software
 authors:
-  - family-names: Lade, Camenisch
-    given-names: Johannes, Casper
+  - family-names: Lade Camenisch
+    given-names: Johannes Casper
 repository-code: https://github.com/SebastianJL/travelling_salesperson_ant_colony/new/main
